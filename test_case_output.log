@@ -1,0 +1,3 @@
+25/06/2015 1:17:58.024 pm Mail[3766]: *** Assertion failure in -[MCMimeBody dataForMimePart:], /SourceCache/Mail/Mail-2098/MailCore/MIME/MCMimeBody.m:362
+25/06/2015 1:17:58.025 pm Mail[3766]: An exception was thrown during execution of an NSScriptCommand...
+25/06/2015 1:17:58.025 pm Mail[3766]: This method must be called off the main thread
