@@ -104,7 +104,7 @@ to _cleanName(_name)
     if item i of _name is in _goodChars then
       set _result to _result & character i of _name
     else
-      set _result to _result & "_" 
+      set _result to _result & "_"
     end if
   end repeat
   if the length of _result > _maxLength then
