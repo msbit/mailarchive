@@ -2,7 +2,6 @@
 
 property _creatorID : "emal"
 property _extension : "eml"
-property _maxLength : 255
 property _messageTitle : "Export selected emails to a folder"
 
 tell application "Mail"
@@ -28,7 +27,7 @@ tell application "Mail"
     --   log _attachment
     -- end repeat
     end if
-    set _subject to my _cleanName(subject of _message) as Unicode text
+    set _subject to my _safeName(subject of _message) as Unicode text
     set _formattedDate to my _dateFormat(date sent of _message)
     set _filenameBase to (_folder & _formattedDate & " " & _subject) as Unicode text
 
@@ -81,11 +80,25 @@ to _dateFormat(_date)
   "XXXX-XX-XX XX-XX-XX"
 end _dateFormat
 
-to _cleanName(_name)
+to _range(i, j)
+  set _i to ASCII number i
+  set _j to ASCII number j
+  set output to {}
+  repeat while _i <= _j
+    set output to output & ASCII character _i
+    set _i to _i + 1
+  end repeat
+
+  return output
+end _range
+
+property _maxLength : 255
+property _safeChars : _range("a", "z") & _range("A", "Z") & { "-", "_", " " }
+
+to _safeName(_name)
   set _result to ""
-  set _goodChars to {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "_", " "}
   repeat with i from 1 to the length of _name
-    if item i of _name is in _goodChars then
+    if item i of _name is in _safeChars then
       set _result to _result & character i of _name
     else
       set _result to _result & "_"
@@ -95,4 +108,4 @@ to _cleanName(_name)
     set _result to (characters 1 through _maxLength of _result) as Unicode text
   end if
   return _result
-end _cleanName
+end _safeName
