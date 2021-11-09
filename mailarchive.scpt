@@ -12,6 +12,7 @@ tell application "Mail"
     set _count to count of _messages
     if the _count is equal to 0 then
       display alert "No Messages Selected" message "Select the messages you want to collect before running this script."
+      return
     end if
 
     set _doneCount to 0
