@@ -6,56 +6,59 @@ property _maxLength : 255
 property _messageTitle : "Export selected emails to a folder"
 
 tell application "Mail"
-  display dialog "Export selected message(s) as Raw Source to " & _extension & " files?" with title "Mail Archive" with icon note
-  if the button returned of the result is "OK" then
-    set _messages to selection
-    set _count to count of _messages
-    if the _count is equal to 0 then
-      display alert "No Messages Selected" message "Select the messages you want to collect before running this script."
-      return
+  try
+    display dialog "Export selected message(s) as Raw Source to " & _extension & " files?" with title "Mail Archive" with icon note
+  on error
+    return
+  end try
+
+  set _messages to selection
+  set _count to count of _messages
+  if the _count is equal to 0 then
+    display alert "No Messages Selected" message "Select the messages you want to collect before running this script."
+    return
+  end if
+
+  set _doneCount to 0
+  set _folder to choose folder
+  repeat with _message in _messages
+    set _attachments to mail attachments of _message
+    if _attachments is not {} then
+    -- repeat with _attachment in mail attachments of _message
+    --   log _attachment
+    -- end repeat
     end if
+    set _subject to my _cleanName(subject of _message) as Unicode text
+    set _formattedDate to my _dateFormat(date sent of _message)
+    set _filenameBase to (_folder & _formattedDate & " " & _subject) as Unicode text
 
-    set _doneCount to 0
-    set _folder to choose folder
-    repeat with _message in _messages
-      set _attachments to mail attachments of _message
-      if _attachments is not {} then
-      -- repeat with _attachment in mail attachments of _message
-      --   log _attachment
-      -- end repeat
-      end if
-      set _subject to my _cleanName(subject of _message) as Unicode text
-      set _formattedDate to my _dateFormat(date sent of _message)
-      set _filenameBase to (_folder & _formattedDate & " " & _subject) as Unicode text
-
-      set _source to source of _message
-      set _destination to (_filenameBase & "." & _extension) as Unicode text
-      try
-        set _fileID to open for access _destination with write permission
-        set eof of the _fileID to 0
-        write _source to _fileID
-        close access _fileID
-        tell application "Finder"
-          try
-            set the creator type of file _destination to _creatorID
-          on error
-            log "Could not set creator type"
-          end try
-        end tell
-      on error _error number _number
-        set _errorMessage to "Can't write message" & return & "Error " & _error & return & "Number " & _number
-        log _errorMessage
-        display dialog _errorMessage
+    set _source to source of _message
+    set _destination to (_filenameBase & "." & _extension) as Unicode text
+    try
+      set _fileID to open for access _destination with write permission
+      set eof of the _fileID to 0
+      write _source to _fileID
+      close access _fileID
+      tell application "Finder"
         try
-          close _fileID
+          set the creator type of file _destination to _creatorID
+        on error
+          log "Could not set creator type"
         end try
+      end tell
+    on error _error number _number
+      set _errorMessage to "Can't write message" & return & "Error " & _error & return & "Number " & _number
+      log _errorMessage
+      display dialog _errorMessage
+      try
+        close _fileID
       end try
-      set _doneCount to _doneCount + 1
-    end repeat
-    display dialog "Successfully exported " & _doneCount & " of " & _count & " messages." & return & return & "Destination folder:" & return & (_folder as Unicode text) buttons {"OK", "Open Folder"} default button 1 with title _messageTitle with icon note
-    if the button returned of the result is "Open Folder" then
-      tell application "Finder" to open folder _folder
-    end if
+    end try
+    set _doneCount to _doneCount + 1
+  end repeat
+  display dialog "Successfully exported " & _doneCount & " of " & _count & " messages." & return & return & "Destination folder:" & return & (_folder as Unicode text) buttons {"OK", "Open Folder"} default button 1 with title _messageTitle with icon note
+  if the button returned of the result is "Open Folder" then
+    tell application "Finder" to open folder _folder
   end if
 end tell
 
