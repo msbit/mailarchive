@@ -27,8 +27,8 @@ tell application "Mail"
     --   log _attachment
     -- end repeat
     end if
-    set _subject to my _safeName(subject of _message) as Unicode text
-    set _formattedDate to my _dateFormat(date sent of _message)
+    set _subject to my safeName(subject of _message) as Unicode text
+    set _formattedDate to my dateFormat(date sent of _message)
     set _filenameBase to (_folder & _formattedDate & " " & _subject) as Unicode text
 
     set _source to source of _message
@@ -63,24 +63,24 @@ end tell
 
 property _months : { January, February, March, April, May, June, July, August, September, October, November, December }
 
-to _pad(input)
+on pad(input)
   text -2 thru -1 of ("00" & input)
-end _pad
+end pad
 
-to _dateFormat(_date)
+on dateFormat(_date)
   repeat with n from 1 to count of _months
     set _month to item n of _months
     if month of _date is _month then
-      set output to "" & (year of _date) & "-" & _pad(n) & "-" & _pad(day of _date)
-      set output to output & " " & _pad(hours of _date) & "-" & _pad(minutes of _date) & "-" & _pad(seconds of _date)
+      set output to "" & (year of _date) & "-" & pad(n) & "-" & pad(day of _date)
+      set output to output & " " & pad(hours of _date) & "-" & pad(minutes of _date) & "-" & pad(seconds of _date)
       return output
     end if
   end repeat
 
   "XXXX-XX-XX XX-XX-XX"
-end _dateFormat
+end dateFormat
 
-to _range(i, j)
+on range(i, j)
   set _i to ASCII number i
   set _j to ASCII number j
   set output to {}
@@ -90,22 +90,22 @@ to _range(i, j)
   end repeat
 
   return output
-end _range
+end range
 
 property _maxLength : 255
-property _safeChars : _range("a", "z") & _range("A", "Z") & { "-", "_", " " }
+property _safeChars : range("a", "z") & range("A", "Z") & { "-", "_", " " }
 
-to _safeName(_name)
-  set _result to ""
+on safeName(_name)
+  set output to ""
   repeat with i from 1 to the length of _name
     if item i of _name is in _safeChars then
-      set _result to _result & character i of _name
+      set output to output & character i of _name
     else
-      set _result to _result & "_"
+      set output to output & "_"
     end if
   end repeat
-  if the length of _result > _maxLength then
-    set _result to (characters 1 through _maxLength of _result) as Unicode text
+  if the length of output > _maxLength then
+    set output to (characters 1 through _maxLength of output) as Unicode text
   end if
-  return _result
-end _safeName
+  return output
+end safeName
