@@ -62,39 +62,23 @@ tell application "Mail"
   end if
 end tell
 
+property _months : { January, February, March, April, May, June, July, August, September, October, November, December }
+
+to _pad(input)
+  text -2 thru -1 of ("00" & input)
+end _pad
+
 to _dateFormat(_date)
-  set _result to ""
-  set _result to _result & year of _date & "-"
-  if (month of _date is January) then
-    set _result to _result & "01-"
-  else if (month of _date is February) then
-    set _result to _result & "02-"
-  else if (month of _date is March) then
-    set _result to _result & "03-"
-  else if (month of _date is April) then
-    set _result to _result & "04-"
-  else if (month of _date is May) then
-    set _result to _result & "05-"
-  else if (month of _date is June) then
-    set _result to _result & "06-"
-  else if (month of _date is July) then
-    set _result to _result & "07-"
-  else if (month of _date is August) then
-    set _result to _result & "08-"
-  else if (month of _date is September) then
-    set _result to _result & "09-"
-  else if (month of _date is October) then
-    set _result to _result & "10-"
-  else if (month of _date is November) then
-    set _result to _result & "11-"
-  else if (month of _date is December) then
-    set _result to _result & "12-"
-  end if
-  set _result to _result & day of _date & " "
-  set _result to _result & hours of _date & "-"
-  set _result to _result & minutes of _date & "-"
-  set _result to _result & seconds of _date
-  return _result as Unicode text
+  repeat with n from 1 to count of _months
+    set _month to item n of _months
+    if month of _date is _month then
+      set output to "" & (year of _date) & "-" & _pad(n) & "-" & _pad(day of _date)
+      set output to output & " " & _pad(hours of _date) & "-" & _pad(minutes of _date) & "-" & _pad(seconds of _date)
+      return output
+    end if
+  end repeat
+
+  "XXXX-XX-XX XX-XX-XX"
 end _dateFormat
 
 to _cleanName(_name)
